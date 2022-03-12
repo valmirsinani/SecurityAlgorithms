@@ -1,0 +1,61 @@
+package Ashifrimi;
+
+
+import javax.crypto.Cipher;
+import java.security.*;
+import java.util.Base64;
+
+public class RSACryptography {
+
+    public static String data = "hello world";
+
+    public static void main(String[] args) {
+        KeyPair keyPair = genKeyPair(1024); 
+        // Get the public key and print it out in base64 format
+        PublicKey publicKey = keyPair.getPublic();
+        System.out.println("Public key:" + base64Encode(publicKey.getEncoded())); 
+        // Get the private key and print it out in base64 format
+        PrivateKey privateKey = keyPair.getPrivate();
+        System.out.println("Private key:" + base64Encode(privateKey.getEncoded())); 
+        // Public key encryption
+        byte[] encryptedBytes = encrypt(data.getBytes(), publicKey);
+        System.out.println("Pas enkriptimit:" + new String(encryptedBytes)); 
+        // Private key decryption
+        byte[] decryptedBytes = decrypt(encryptedBytes, privateKey);
+        System.out.println("Pas dektiptimit:" + new String(decryptedBytes));
+    }
+
+    public static String base64Encode(byte[] src) {
+        return new String(Base64.getEncoder().encode(src));
+    } 
+    public static KeyPair genKeyPair(int keyLength) {
+        try {
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            keyPairGenerator.initialize(1024);
+            return keyPairGenerator.generateKeyPair();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    } 
+    public static byte[] encrypt(byte[] content, PublicKey publicKey) {
+        try {
+            Cipher cipher = Cipher.getInstance("RSA");// java default "RSA"="RSA/ECB/PKCS1Padding"
+            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+            return cipher.doFinal(content);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    } 
+    public static byte[] decrypt(byte[] content, PrivateKey privateKey) {
+        try {
+            Cipher cipher = Cipher.getInstance("RSA");
+            cipher.init(Cipher.DECRYPT_MODE, privateKey);
+            return cipher.doFinal(content);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+}
