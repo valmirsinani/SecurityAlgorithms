@@ -1,0 +1,61 @@
+package Ashifrimi;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.Signature;
+import java.util.Base64;
+ 
+
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.SecureRandom;
+import java.security.Security;
+import java.security.Signature;
+//https://www.wikihow.com/Add-JARs-to-Project-Build-Paths-in-Eclipse-(Java)
+//https://jar-download.com/artifacts/org.bouncycastle/bcprov-jdk15on
+/*
+ * http://www.java2s.com/Tutorial/Java/0490__Security/RSAexamplewithrandomkeygeneration.htm*/
+public class RSABasic {
+	  public static void main_adv(String[] args) throws Exception {
+		    Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+
+		    KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA", "BC");
+
+		    keyGen.initialize(512, new SecureRandom());
+
+		    KeyPair keyPair = keyGen.generateKeyPair();
+		    Signature signature = Signature.getInstance("SHA1withRSA", "BC");
+
+		    signature.initSign(keyPair.getPrivate(), new SecureRandom());
+
+		    byte[] message = "abc".getBytes();
+		    signature.update(message);
+
+		    byte[] sigBytes = signature.sign();
+		    signature.initVerify(keyPair.getPublic());
+		    signature.update(message);
+		    System.out.println(signature.verify(sigBytes));
+		  }
+	
+	  public static void main(String[] args) throws Exception {
+		    KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+		    kpg.initialize(1024);
+		    KeyPair keyPair = kpg.genKeyPair();
+
+		    byte[] data = "test".getBytes("UTF8");
+
+		    Signature sig = Signature.getInstance("MD5WithRSA");
+		    sig.initSign(keyPair.getPrivate());
+		    sig.update(data);
+		    byte[] signatureBytes = sig.sign();
+		    System.out.println("Singature:" + base64Encode(signatureBytes));
+
+		    sig.initVerify(keyPair.getPublic());
+		    sig.update(data);
+
+		    System.out.println(sig.verify(signatureBytes));
+		  }
+	  
+	   public static String base64Encode(byte[] src) {
+	        return new String(Base64.getEncoder().encode(src));
+	    } 
+}
